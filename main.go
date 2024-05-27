@@ -1,7 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"wb0-app/logger"
+)
 
 func main() {
-	fmt.Println("Hello world!")
+	logg := logger.Setup()
+	logg.Debug("Hello world!")
 }
