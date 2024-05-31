@@ -1,0 +1,16 @@
+version: '3'
+services:
+  broker:
+    image: nats-streaming:0.25.6-alpine3.18
+    ports:
+      - "8222:8222"
+      - "4222:4222"
+    command: "-cluster_id=${BROKER_CID} -store=file -dir=/nats/data"
+    volumes:
+      - wb0-data:/nats/data
+    env_file: .env
+  db:
+    image: postgres:16.2-alpine3.18
+
+volumes:
+  wb0-data:
