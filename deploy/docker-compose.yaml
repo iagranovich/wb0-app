@@ -7,10 +7,22 @@ services:
       - "4222:4222"
     command: "-cluster_id=${BROKER_CID} -store=file -dir=/nats/data"
     volumes:
-      - wb0-data:/nats/data
+      - broker-data:/nats/data
     env_file: .env
+  
   db:
     image: postgres:16.2-alpine3.18
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    volumes:
+      - db-data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+    env_file: .env
+
 
 volumes:
-  wb0-data:
+  broker-data:
+  db-data:
