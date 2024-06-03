@@ -7,14 +7,17 @@ import (
 	"time"
 	"wb0-app/config"
 	"wb0-app/logger"
+	"wb0-app/storage"
 
 	"github.com/nats-io/stan.go"
 )
 
 func main() {
+	fmt.Println("Hello world!")
 	config.Load()
 	logg := logger.Setup()
-	logg.Debug("Hello world!")
+	// test connection to db
+	storage.New()
 
 	sub, err := stan.Connect(os.Getenv("BROKER_CID"), "sub")
 	if err != nil {
