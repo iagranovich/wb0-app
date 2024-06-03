@@ -8,7 +8,7 @@ CREATE TABLE orders (
     delivery_service VARCHAR(255),
     shardkey INT,
     sm_id INT,
-    date_created TIMESTAMP,
+    date_created VARCHAR(255),
     oof_shard INT
 );
 
@@ -27,6 +27,7 @@ CREATE TABLE deliveries (
 CREATE TABLE payments (
     order_uid VARCHAR(255) REFERENCES orders(order_uid),
     transaction VARCHAR(255),
+    request_id VARCHAR(255),
     currency VARCHAR(255),
     provider VARCHAR(255),
     amount INT,
