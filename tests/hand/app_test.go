@@ -28,7 +28,7 @@ func TestApp(t *testing.T) {
 		log.Fatal(err.Error())
 	}
 
-	// make migrations
+	// prepare test db
 	m, err := migrate.New(
 		"file://../../migrations",
 		fmt.Sprintf("postgres://%s:%s@localhost:%s/%s?sslmode=disable",
@@ -43,6 +43,7 @@ func TestApp(t *testing.T) {
 		log.Fatal("op: m.up ", err.Error())
 	}
 
+	// json to Order struct
 	orderJson := `{
 		"order_uid": "b563feb7b2b84b6test",
 		"track_number": "WBILMTESTTRACK",
@@ -111,8 +112,6 @@ func TestApp(t *testing.T) {
 		log.Fatalf(err.Error())
 	}
 
-	// save order to db
-	order.Payment.OrderUid = order.OrderUid
-	order.Delivery.OrderUid = order.OrderUid
-	s.SaveOrder(&order, &order.Payment, order.Items, &order.Delivery)
+	// TEST: save order to db
+	s.SaveOrder(&order)
 }

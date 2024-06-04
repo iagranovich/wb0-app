@@ -30,8 +30,16 @@ func New() (*Storage, error) {
 	return &Storage{db: db}, nil
 }
 
-func (s *Storage) SaveOrder(o *m.Order, p *m.Payment, i []m.Item, d *m.Delivery) {
-	qO := `INSERT INTO orders (
+func (s *Storage) SaveOrder(order *m.Order) {
+
+	payment := &order.Payment
+	delivery := &order.Delivery
+	items := order.Items
+
+	payment.OrderUid = order.OrderUid
+	delivery.OrderUid = order.OrderUid
+
+	orderQuery := `INSERT INTO orders (
 		    order_uid, track_number, entry, locale,
 		    internal_signature, customer_id, delivery_service, shardkey,
 		    sm_id, date_created, oof_shard
@@ -41,7 +49,7 @@ func (s *Storage) SaveOrder(o *m.Order, p *m.Payment, i []m.Item, d *m.Delivery)
 			:internal_signature, :customer_id, :delivery_service,
 			:shardkey, :sm_id, :date_created, :oof_shard
 		)`
-	qP := `INSERT INTO payments (
+	paymentQuery := `INSERT INTO payments (
 		    order_uid, transaction, request_id, currency, provider,
 			amount, payment_dt, bank, delivery_cost, goods_total,
 			custom_fee
@@ -51,7 +59,7 @@ func (s *Storage) SaveOrder(o *m.Order, p *m.Payment, i []m.Item, d *m.Delivery)
 			:amount, :payment_dt, :bank, :delivery_cost, :goods_total,
 			:custom_fee
 		)`
-	qI := `INSERT INTO items (
+	itemQuery := `INSERT INTO items (
 		    chrt_id, track_number, price, rid, name, sale, 
 			size, total_price, nm_id, brand, status
 	    )
@@ -59,7 +67,7 @@ func (s *Storage) SaveOrder(o *m.Order, p *m.Payment, i []m.Item, d *m.Delivery)
 			:chrt_id, :track_number, :price, :rid, :name, :sale, 
 			:size, :total_price, :nm_id, :brand, :status
 		)`
-	qD := `INSERT INTO deliveries (
+	deliveryQuery := `INSERT INTO deliveries (
 		    order_uid, name, phone, zip, city, address, region, email
 	    )
 		VALUES (
@@ -67,16 +75,16 @@ func (s *Storage) SaveOrder(o *m.Order, p *m.Payment, i []m.Item, d *m.Delivery)
 		)`
 
 	tx := s.db.MustBegin()
-	if _, err := tx.NamedExec(qO, o); err != nil {
+	if _, err := tx.NamedExec(orderQuery, order); err != nil {
 		slog.Error("storage: cannot save data to Orders table", slog.String("error", err.Error()))
 	}
-	if _, err := tx.NamedExec(qP, p); err != nil {
+	if _, err := tx.NamedExec(paymentQuery, payment); err != nil {
 		slog.Error("storage: cannot save data to Payments table", slog.String("error", err.Error()))
 	}
-	if _, err := tx.NamedExec(qI, i); err != nil {
+	if _, err := tx.NamedExec(itemQuery, items); err != nil {
 		slog.Error("storage: cannot save data to Items table", slog.String("error", err.Error()))
 	}
-	if _, err := tx.NamedExec(qD, d); err != nil {
+	if _, err := tx.NamedExec(deliveryQuery, delivery); err != nil {
 		slog.Error("storage: cannot save data to Deliveries table", slog.String("error", err.Error()))
 	}
 	tx.Commit()
