@@ -2,11 +2,11 @@ package models
 
 type Delivery struct {
 	OrderUid string `db:"order_uid"`
-	Name     string `db:"name"`
-	Phone    string `db:"phone"`
-	Zip      string `db:"zip"`
-	City     string `db:"city"`
-	Address  string `db:"address"`
-	Region   string `db:"region"`
-	Email    string `db:"email"`
+	Name     string `db:"name" json:"name"`
+	Phone    string `db:"phone" json:"phone"`
+	Zip      string `db:"zip" json:"zip"`
+	City     string `db:"city" json:"city"`
+	Address  string `db:"address" json:"address"`
+	Region   string `db:"region" json:"region"`
+	Email    string `db:"email" json:"email"`
 }

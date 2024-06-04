@@ -1,0 +1,16 @@
+version: '3'
+services:
+  db-test:    
+    image: postgres:16.2-alpine3.18
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: wb0-app_test
+    volumes:
+      - db-data-test:/var/lib/postgresql/data/
+    ports:
+      - "5433:5432"
+
+
+volumes:
+  db-data-test:

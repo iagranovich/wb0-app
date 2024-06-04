@@ -15,21 +15,22 @@ type Storage struct {
 	db *sqlx.DB
 }
 
-func New() *Storage {
+func New() (*Storage, error) {
 	db, err := sqlx.Connect("postgres",
-		fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
+		fmt.Sprintf("user=%s password=%s dbname=%s port=%s sslmode=disable",
 			os.Getenv("DB_USERNAME"),
 			os.Getenv("DB_PASSWORD"),
-			os.Getenv("DB_DATABASE")))
+			os.Getenv("DB_DATABASE"),
+			os.Getenv("DB_PORT")))
 	if err != nil {
 		slog.Error("storage: cannot connect to db", slog.String("error", err.Error()))
-		os.Exit(1)
+		return nil, err
 	}
 
-	return &Storage{db: db}
+	return &Storage{db: db}, nil
 }
 
-func (s *Storage) SaveOrder(o *m.Order, p *m.Payment, i *m.Item, d *m.Delivery) {
+func (s *Storage) SaveOrder(o *m.Order, p *m.Payment, i []m.Item, d *m.Delivery) {
 	qO := `INSERT INTO orders (
 		    order_uid, track_number, entry, locale,
 		    internal_signature, customer_id, delivery_service, shardkey,

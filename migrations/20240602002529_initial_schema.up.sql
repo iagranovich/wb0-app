@@ -6,10 +6,10 @@ CREATE TABLE orders (
     internal_signature VARCHAR(255),
     customer_id VARCHAR(255),
     delivery_service VARCHAR(255),
-    shardkey INT,
+    shardkey VARCHAR(255),
     sm_id INT,
     date_created VARCHAR(255),
-    oof_shard INT
+    oof_shard VARCHAR(255)
 );
 
 CREATE TABLE deliveries (
