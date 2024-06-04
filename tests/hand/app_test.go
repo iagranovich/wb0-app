@@ -23,10 +23,7 @@ func TestApp(t *testing.T) {
 	}
 
 	// connection to test db
-	s, err := storage.New()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+	s := storage.New()
 
 	// prepare test db
 	m, err := migrate.New(
