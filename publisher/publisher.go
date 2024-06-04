@@ -92,9 +92,8 @@ func main() {
 	slog.Info("publisher: connect to NATS successful")
 	defer pub.Close()
 
-	order := randomOrder()
 	for i := 0; ; i++ {
-		err = pub.Publish("order-channel", []byte(order))
+		err = pub.Publish("order-channel", []byte(randomOrder()))
 		if err != nil {
 			slog.Error("publisher: cannot publish", slog.String("error", err.Error()))
 		}
