@@ -22,7 +22,7 @@ func New() *StanClient {
 	return &StanClient{Conn: conn}
 }
 
-func (sc *StanClient) Subscribe(order models.Order, orderHandler func(models.Order)) {
+func (sc *StanClient) Subscribe(order models.Order, orderHandler ...func(models.Order)) {
 
 	_, err := sc.Conn.Subscribe("order-channel", func(m *stan.Msg) {
 
@@ -32,11 +32,14 @@ func (sc *StanClient) Subscribe(order models.Order, orderHandler func(models.Ord
 			return
 		}
 
-		orderHandler(order)
+		for _, handler := range orderHandler {
+			handler(order)
+		}
 	},
 		stan.DurableName("dsub"))
 	if err != nil {
 		slog.Error("subscriber: cannot subscribe", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 
 }

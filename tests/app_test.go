@@ -97,9 +97,10 @@ func TestSaveOrderToDB(t *testing.T) {
 
 func TestStanClient_Subscribe(t *testing.T) {
 	storage := Init()
+	cache := cache.New()
 
 	subscriber := client.New()
-	subscriber.Subscribe(models.Order{}, storage.Save)
+	subscriber.Subscribe(models.Order{}, storage.Save, cache.Save)
 
 	time.Sleep(5 * time.Second)
 }
