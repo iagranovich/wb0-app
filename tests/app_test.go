@@ -92,10 +92,10 @@ func TestSaveOrderToDB(t *testing.T) {
 		log.Fatalf(err.Error())
 	}
 
-	storage.Save(&order)
+	storage.Save(order)
 }
 
-func TestSubscriber(t *testing.T) {
+func TestStanClient_Subscribe(t *testing.T) {
 	storage := Init()
 
 	subscriber := client.New()

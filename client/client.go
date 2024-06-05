@@ -22,7 +22,7 @@ func New() *StanClient {
 	return &StanClient{Conn: conn}
 }
 
-func (sc *StanClient) Subscribe(order models.Order, orderHandler func(*models.Order)) {
+func (sc *StanClient) Subscribe(order models.Order, orderHandler func(models.Order)) {
 
 	_, err := sc.Conn.Subscribe("order-channel", func(m *stan.Msg) {
 
@@ -32,7 +32,7 @@ func (sc *StanClient) Subscribe(order models.Order, orderHandler func(*models.Or
 			return
 		}
 
-		orderHandler(&order)
+		orderHandler(order)
 	},
 		stan.DurableName("dsub"))
 	if err != nil {
