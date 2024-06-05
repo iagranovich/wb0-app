@@ -23,7 +23,7 @@ func randomString(length int, charset string) string {
 
 func randomOrder() string {
 	uppercase := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	lowercase := "abcdefghijklmnopqrstuvwxyz"
+	lowercase := "abdefghijklmnopqrstuvwxyz"
 	numbers := "0123456789"
 
 	orderUid := randomString(19, lowercase+numbers)
@@ -31,8 +31,8 @@ func randomOrder() string {
 	chrtId, _ := strconv.Atoi(randomString(9, numbers))
 
 	jsonOrder := fmt.Sprintf(`{
-		"order_uid": %s,
-		"track_number": %s,
+		"order_uid": "%s",
+		"track_number": "%s",
 		"entry": "WBIL",
 		"delivery": {
 		  "name": "Test Testov",
@@ -58,7 +58,7 @@ func randomOrder() string {
 		"items": [
 		  {
 			"chrt_id": %d,
-			"track_number": %s,
+			"track_number": "%s",
 			"price": 453,
 			"rid": "ab4219087a764ae0btest",
 			"name": "Mascaras",
@@ -93,11 +93,13 @@ func main() {
 	defer pub.Close()
 
 	for i := 0; ; i++ {
-		err = pub.Publish("order-channel", []byte(randomOrder()))
+		order := randomOrder()
+		fmt.Println(order)
+		err = pub.Publish("order-channel", []byte(order))
 		if err != nil {
 			slog.Error("publisher: cannot publish", slog.String("error", err.Error()))
 		}
-		time.Sleep(1 * time.Second)
+		time.Sleep(2 * time.Second)
 	}
 
 }

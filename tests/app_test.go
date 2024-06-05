@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"testing"
+	"time"
+	"wb0-app/client"
 	"wb0-app/models"
 	"wb0-app/storage"
 
@@ -15,30 +17,9 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func TestApp(t *testing.T) {
+func TestSaveOrderToDB(t *testing.T) {
 
-	// config
-	if err := godotenv.Load("test.env"); err != nil {
-		log.Fatal(err.Error())
-	}
-
-	// connection to test db
-	s := storage.New()
-
-	// prepare test db
-	m, err := migrate.New(
-		"file://../../migrations",
-		fmt.Sprintf("postgres://%s:%s@localhost:%s/%s?sslmode=disable",
-			os.Getenv("DB_USERNAME"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_PORT"), os.Getenv("DB_DATABASE")))
-	if err != nil {
-		log.Fatal("op: migrate.new ", err.Error())
-	}
-	if err := m.Down(); err != nil {
-		log.Fatal("op: m.down ", err.Error())
-	}
-	if err := m.Up(); err != nil {
-		log.Fatal("op: m.up ", err.Error())
-	}
+	storage := Init()
 
 	// json to Order struct
 	orderJson := `{
@@ -109,6 +90,42 @@ func TestApp(t *testing.T) {
 		log.Fatalf(err.Error())
 	}
 
-	// TEST: save order to db
-	s.SaveOrder(&order)
+	storage.Save(&order)
+}
+
+func TestReadAndSaveOrderToDb(t *testing.T) {
+	storage := Init()
+
+	subscriber := client.New()
+	subscriber.Subscribe(models.Order{}, storage.Save)
+
+	time.Sleep(5 * time.Second)
+
+}
+
+func Init() *storage.Storage {
+	// config
+	if err := godotenv.Load("test.env"); err != nil {
+		log.Fatal(err.Error())
+	}
+
+	// connection to test db
+	s := storage.New()
+
+	// prepare test db
+	m, err := migrate.New(
+		"file://../migrations",
+		fmt.Sprintf("postgres://%s:%s@localhost:%s/%s?sslmode=disable",
+			os.Getenv("DB_USERNAME"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_PORT"), os.Getenv("DB_DATABASE")))
+	if err != nil {
+		log.Fatal("op: migrate.new ", err.Error())
+	}
+	if err := m.Down(); err != nil {
+		log.Fatal("op: m.down ", err.Error())
+	}
+	if err := m.Up(); err != nil {
+		log.Fatal("op: m.up ", err.Error())
+	}
+
+	return s
 }

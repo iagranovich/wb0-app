@@ -30,7 +30,7 @@ func New() *Storage {
 	return &Storage{db: db}
 }
 
-func (s *Storage) SaveOrder(order *m.Order) {
+func (s *Storage) Save(order *m.Order) {
 
 	payment := &order.Payment
 	delivery := &order.Delivery
