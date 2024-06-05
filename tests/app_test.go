@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 	"time"
+	"wb0-app/cache"
 	"wb0-app/client"
 	"wb0-app/models"
 	"wb0-app/storage"
@@ -15,6 +16,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/joho/godotenv"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSaveOrderToDB(t *testing.T) {
@@ -93,13 +95,27 @@ func TestSaveOrderToDB(t *testing.T) {
 	storage.Save(&order)
 }
 
-func TestReadAndSaveOrderToDb(t *testing.T) {
+func TestSubscriber(t *testing.T) {
 	storage := Init()
 
 	subscriber := client.New()
 	subscriber.Subscribe(models.Order{}, storage.Save)
 
 	time.Sleep(5 * time.Second)
+}
+
+func TestMemCache(t *testing.T) {
+	cache := cache.New()
+	orderuid := "orderuid"
+	order := models.Order{OrderUid: orderuid}
+
+	cache.Save(order)
+
+	_, err := cache.FindByUid("ssssssssss")
+	require.Error(t, err)
+
+	_, err = cache.FindByUid(orderuid)
+	require.NoError(t, err)
 
 }
 
