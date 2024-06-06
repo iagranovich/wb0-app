@@ -12,6 +12,10 @@ type memStorage struct {
 	mu   sync.Mutex
 }
 
+type persistantStorage interface {
+	FindAll() []models.Order
+}
+
 func New() *memStorage {
 	return &memStorage{data: make(map[string]models.Order)}
 }
@@ -34,4 +38,11 @@ func (ms *memStorage) FindByUid(uid string) (models.Order, error) {
 		return models.Order{}, errors.New(msg)
 	}
 	return order, nil
+}
+
+func (ms *memStorage) Restore(ps persistantStorage) {
+	orders := ps.FindAll()
+	for _, order := range orders {
+		ms.Save(order)
+	}
 }

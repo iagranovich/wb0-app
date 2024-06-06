@@ -105,7 +105,7 @@ func TestStanClient_Subscribe(t *testing.T) {
 	time.Sleep(5 * time.Second)
 }
 
-func TestMemCache(t *testing.T) {
+func TestCache_Save_FindByUid(t *testing.T) {
 	cache := cache.New()
 	orderuid := "orderuid"
 	order := models.Order{OrderUid: orderuid}
@@ -115,8 +115,44 @@ func TestMemCache(t *testing.T) {
 	_, err := cache.FindByUid("ssssssssss")
 	require.Error(t, err)
 
-	_, err = cache.FindByUid(orderuid)
+	result, err := cache.FindByUid(orderuid)
 	require.NoError(t, err)
+	require.Equal(t, order, result)
+
+}
+
+type mockStorage struct{}
+
+func (s *mockStorage) FindAll() []models.Order {
+	orders := []models.Order{
+		{
+			OrderUid: "1111",
+		},
+		{
+			OrderUid: "2222",
+		},
+	}
+
+	return orders
+}
+
+func TestCache_Restore(t *testing.T) {
+	ms := &mockStorage{}
+	cache := cache.New()
+
+	cache.Restore(ms)
+
+	result, err := cache.FindByUid("1111")
+	require.NoError(t, err)
+	require.Equal(t, "1111", result.OrderUid)
+
+	result, err = cache.FindByUid("2222")
+	require.NoError(t, err)
+	require.Equal(t, "2222", result.OrderUid)
+
+	result, err = cache.FindByUid("3333")
+	require.Error(t, err)
+	require.Empty(t, result)
 
 }
 
