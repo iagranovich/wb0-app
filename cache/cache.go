@@ -7,7 +7,7 @@ import (
 	"wb0-app/models"
 )
 
-type memStorage struct {
+type MemStorage struct {
 	data map[string]models.Order
 	mu   sync.Mutex
 }
@@ -16,18 +16,18 @@ type persistantStorage interface {
 	FindAll() []models.Order
 }
 
-func New() *memStorage {
-	return &memStorage{data: make(map[string]models.Order)}
+func New() *MemStorage {
+	return &MemStorage{data: make(map[string]models.Order)}
 }
 
-func (ms *memStorage) Save(order models.Order) {
+func (ms *MemStorage) Save(order models.Order) {
 
 	ms.mu.Lock()
 	defer ms.mu.Unlock()
 	ms.data[order.OrderUid] = order
 }
 
-func (ms *memStorage) FindByUid(uid string) (models.Order, error) {
+func (ms *MemStorage) FindByUid(uid string) (models.Order, error) {
 	ms.mu.Lock()
 	defer ms.mu.Unlock()
 
@@ -40,7 +40,7 @@ func (ms *memStorage) FindByUid(uid string) (models.Order, error) {
 	return order, nil
 }
 
-func (ms *memStorage) Restore(ps persistantStorage) {
+func (ms *MemStorage) Restore(ps persistantStorage) {
 	orders := ps.FindAll()
 	for _, order := range orders {
 		ms.Save(order)
