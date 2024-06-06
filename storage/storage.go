@@ -89,3 +89,27 @@ func (s *Storage) Save(order m.Order) {
 	}
 	tx.Commit()
 }
+
+func (s *Storage) FindAll() []m.Order {
+	orders := []m.Order{}
+	s.db.Select(&orders, "SELECT * FROM orders")
+
+	var result []m.Order
+	for _, order := range orders {
+		items := []m.Item{}
+		s.db.Select(&items, "SELECT * FROM items WHERE track_number=$1", order.TrackNumber)
+		order.Items = items
+
+		payment := m.Payment{}
+		s.db.Get(&payment, "SELECT * FROM payments WHERE order_uid=$1", order.OrderUid)
+		order.Payment = payment
+
+		delivery := m.Delivery{}
+		s.db.Get(&delivery, "SELECT * FROM deliveries WHERE order_uid=$1", order.OrderUid)
+		order.Delivery = delivery
+
+		result = append(result, order)
+	}
+
+	return result
+}

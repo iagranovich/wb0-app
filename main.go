@@ -22,6 +22,7 @@ func main() {
 	storage := storage.New()
 
 	cache := cache.New()
+	cache.Restore(storage)
 
 	subscriber := client.New()
 	subscriber.Subscribe(models.Order{}, storage.Save, cache.Save)
