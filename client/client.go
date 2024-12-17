@@ -9,11 +9,11 @@ import (
 	"github.com/nats-io/stan.go"
 )
 
-type StanClient struct {
+type stanClient struct {
 	Conn stan.Conn
 }
 
-func New() *StanClient {
+func New() Client {
 	conn, err := stan.Connect(os.Getenv("BROKER_CID"), "sub")
 	if err != nil {
 		slog.Error("subscriber: cannot conect to NATS", slog.String("error", err.Error()))
@@ -22,7 +22,7 @@ func New() *StanClient {
 	return &StanClient{Conn: conn}
 }
 
-func (sc *StanClient) Subscribe(order models.Order, orderHandler ...func(models.Order)) {
+func (sc stanClient) Subscribe(order models.Order, orderHandler ...func(models.Order)) {
 
 	_, err := sc.Conn.Subscribe("order-channel", func(m *stan.Msg) {
 
