@@ -7,15 +7,23 @@ import (
 	"wb0-app/models"
 )
 
-type InCacheOrderFinder interface {
+type Cache interface {
 	FindByUid(string) (models.Order, error)
 }
 
-func MakeOrderHandler(cache InCacheOrderFinder) http.HandlerFunc {
+type handler struct {
+	cache Cache
+}
+
+func New(c Cache) *handler {
+	return &handler{cache: c}
+}
+
+func (h hanler) MakeOrderHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := r.FormValue("userInput")
 
-		order, err := cache.FindByUid(id)
+		order, err := h.cache.FindByUid(id)
 
 		var data []byte
 		if err != nil {
@@ -29,7 +37,7 @@ func MakeOrderHandler(cache InCacheOrderFinder) http.HandlerFunc {
 	}
 }
 
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
+func (h hanler) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("http/templates/index.html")
 	t.Execute(w, nil)
 }

@@ -27,8 +27,10 @@ func main() {
 	subscriber := client.New()
 	subscriber.Subscribe(models.Order{}, storage.Save, cache.Save)
 
-	http.HandleFunc("/", handlers.IndexHandler)
-	http.HandleFunc("/order", handlers.MakeOrderHandler(cache))
+	handler := handlers.New(cache)
+
+	http.HandleFunc("/", handler.IndexHandler)
+	http.HandleFunc("/order", handler.MakeOrderHandler())
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
