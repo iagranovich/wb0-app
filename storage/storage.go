@@ -11,11 +11,11 @@ import (
 	m "wb0-app/models"
 )
 
-type Storage struct {
+type storage struct {
 	db *sqlx.DB
 }
 
-func New() *Storage {
+func New() Storage {
 	db, err := sqlx.Connect("postgres",
 		fmt.Sprintf("user=%s password=%s dbname=%s port=%s sslmode=disable",
 			os.Getenv("DB_USERNAME"),
@@ -27,10 +27,10 @@ func New() *Storage {
 		os.Exit(1)
 	}
 
-	return &Storage{db: db}
+	return &storage{db: db}
 }
 
-func (s *Storage) Save(order m.Order) {
+func (s storage) Save(order m.Order) {
 
 	payment := &order.Payment
 	delivery := &order.Delivery
@@ -90,7 +90,7 @@ func (s *Storage) Save(order m.Order) {
 	tx.Commit()
 }
 
-func (s *Storage) FindAll() []m.Order {
+func (s storage) FindAll() []m.Order {
 	orders := []m.Order{}
 	s.db.Select(&orders, "SELECT * FROM orders")
 
